@@ -1,0 +1,54 @@
+[subs="attributes"]
+++++
+<style type="text/css">
+.reveal code {
+    font-size: large;
+    line-height: normal;
+}
+.reveal section img {
+  border: 0;
+  box-shadow: none;
+}
+
+.reveal section {
+    display: block;
+}
+
+.reveal section h1 {
+  text-align: left;
+}
+
+.reveal section h2 {
+  text-align: left;
+  font-size: larger;
+}
+
+.reveal h3 {
+  text-align: left;
+}
+
+.reveal p {
+  text-align: left;
+  font-size: x-large;
+}
+
+.reveal ul {
+  display: block;
+  font-size: x-large;
+}
+
+.reveal ol {
+  display: block;
+  font-size: x-large;
+}
+
+.reveal .paragraph {
+  display: block;
+}
+
+.reveal .ulist {
+  display: block;
+}
+
+</style>
+++++

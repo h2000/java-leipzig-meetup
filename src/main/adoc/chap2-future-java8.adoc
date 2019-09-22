@@ -1,0 +1,44 @@
+== Future in Java 8 (push)
+
+=== !
+// Future8 thenAccept callback 1.
+
+[.stretch]
+[source,java]
+----
+include::../java/de/meetup/CompletableFuture8.java[tags=future80]
+
+include::../java/de/meetup/CompletableFuture8.java[tags=future81]
+----
+
+=== !
+// Future8 map / flatMap 2.
+
+[.stretch]
+[source,java]
+----
+include::../java/de/meetup/CompletableFuture8.java[tags=future82]
+
+include::../java/de/meetup/CompletableFuture8.java[tags=future83]
+----
+
+=== !
+// Future8 combine 3.2. / 3.3.
+
+[.stretch]
+[source,java]
+----
+include::../java/de/meetup/CompletableFuture8.java[tags=future84]
+
+include::../java/de/meetup/CompletableFuture8.java[tags=future85]
+----
+
+
+=== !
+// Future8 exceptionally
+
+[.stretch]
+[source,java]
+----
+include::../java/de/meetup/CompletableFuture8.java[tags=future86]
+----

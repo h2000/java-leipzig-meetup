@@ -9,6 +9,9 @@ import java.util.concurrent.TimeUnit;
 public class CompletableFuture9 {
 
   public static void main(String[] args) {
+    // tag::future9[]
+    // -- only small changes from java 8 to java 9 (excerpt)
+
     // use default executor if not other provided (e.g. for subclass)
     new CompletableFuture<>().defaultExecutor();
 
@@ -23,11 +26,12 @@ public class CompletableFuture9 {
       .completeAsync(() -> "input", delayedExecutor);
 
     // orTimeout, exceptional if timeout reached
-    new CompletableFuture().orTimeout(1, TimeUnit.SECONDS);
+    new CompletableFuture<>().orTimeout(1, TimeUnit.SECONDS);
 
     // completeOnTimeout with input
     new CompletableFuture<>().completeOnTimeout("input", 1, TimeUnit.SECONDS);
 
     // ...
+    // end::future9[]
   }
 }

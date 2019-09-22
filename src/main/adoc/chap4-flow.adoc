@@ -1,0 +1,26 @@
+== Reactive Streams (Pull-Push)
+
+https://thepracticaldeveloper.com/2018/01/31/reactive-programming-java-9-flow/
+
+=== Motivation
+
+Generalisation
+
+* T -> Future<T>
+* Iterable<T> -> Flow.Publisher<T>
+
+Pattern: onNext(t) 0..N [onError(Throwable) | onComplete()]
+
+* Composability and readability
+* Data as a flow manipulated with a rich vocabulary of operators
+* Nothing happens until you subscribe
+* Back pressure the consumer can signal the producer that the rate of emission is too high
+* High level but high value abstraction that is concurrency-agnostic
+
+
+“Reactive Streams”-Standard defines simple interfaces and rules (incl. test kit TCK) +
+=> which are now in java9 as Foundation
+
+=== !
+[.stretch]
+image::rx2.svg[]
