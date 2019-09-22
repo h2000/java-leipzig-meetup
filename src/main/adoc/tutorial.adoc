@@ -1,0 +1,80 @@
+= Java Meetup
+:source-highlighter: highlightjs
+// :revealjs_plugin_pdf: enabled
+:revealjs_theme: simple
+:highlightjs-theme: https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/googlecode.min.css
+
+[subs="attributes"]
+++++
+<style type="text/css">
+.reveal code {
+    font-size: large;
+    line-height: normal;
+}
+</style>
+++++
+
+== Future in Java 8
+
+=== !
+// Future
+
+[.stretch]
+[source,java]
+----
+include::../java/de/meetup/CompletableFuture8.java[tags=future80]
+----
+
+=== !
+// Future
+
+[.stretch]
+[source,java]
+----
+include::../java/de/meetup/CompletableFuture8.java[tags=future81]
+----
+
+
+[transition=zoom, %notitle]
+== RX
+
+[plantuml, diagram-classes, png]
+....
+@startuml
+
+title Reactive Streams Specification\nSimplified Communication Flow
+'skinparam handwritten true
+skinparam shadowing false
+
+skinparam sequence {
+ArrowColor black
+ActorBorderColor black
+LifeLineBorderColor black
+LifeLineBackgroundColor black
+
+ParticipantBorderColor black
+ParticipantBackgroundColor white
+ParticipantFontColor black
+}
+
+Subscriber -> Publisher : subscribe()
+Publisher -> Subscription : new()
+Publisher -> Subscriber : onSubscribe(Subscription)
+loop until completed
+Subscriber -> Subscription : request(int)
+Subscription -> Publisher
+alt no error
+Publisher -> Subscriber : onNext(T)
+else error
+Publisher -> Subscriber : onError(Throwable)
+end
+
+alt cancel subscription
+Subscriber -> Subscription : cancel()
+Subscription -> Publisher
+end
+end
+Publisher -> Subscriber : onComplete()
+
+@enduml
+....
