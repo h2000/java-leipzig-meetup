@@ -1,4 +1,4 @@
-== Future before Java 8 (poll)
+== Future before Java 8 (pull)
 
 === !
 

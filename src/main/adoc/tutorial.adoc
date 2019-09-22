@@ -1,9 +1,10 @@
-= Java Meetup
+= Java Meetup Leipzig
 :source-highlighter: highlightjs
 // :revealjs_plugin_pdf: enabled
 :revealjs_theme: white
 :highlightjs-theme: https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/googlecode.min.css
 :revealjs_slideNumber: true
+From Future to Flow in Java 9 (pull, push, pull-push) - Alf Richter
 
 include::custom.adoc[]
 

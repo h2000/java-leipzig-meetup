@@ -1,5 +1,6 @@
-== Reactive Streams (Pull-Push)
+== Reactive Streams (pull-push)
 
+TODO
 https://thepracticaldeveloper.com/2018/01/31/reactive-programming-java-9-flow/
 
 === Motivation
