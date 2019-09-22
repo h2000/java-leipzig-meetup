@@ -7,30 +7,6 @@ import java.util.stream.IntStream;
 
 public class Flow9 {
 
-  // # RX
-  //
-  // T -> Future<T>
-  // Iterable<T> -> Flow.Publisher<T>
-  //
-  // # Pattern:
-  // onNext(t) 0..N [onError(Throwable) | onComplete()]
-
-  //  # From Imperative to Reactive Programming (from https://projectreactor.io)
-  //
-  //  Reactive libraries such as Reactor aim to address these drawbacks
-  //  of "classic" asynchronous approaches on the JVM while also
-  //  focusing on a few additional aspects:
-  //
-  //  - Composability and readability
-  //  - Data as a flow manipulated with a rich vocabulary of operators
-  //  - Nothing happens until you subscribe
-  //  - Backpressure or the ability for the consumer to signal the producer
-  //    that the rate of emission is too high
-  //  - High level but high value abstraction that is concurrency-agnostic
-  //
-  // “Reactive Streams”-Standard defines simple interfaces and rules (incl. test kit TCK)
-  // => which are now in java9 as Foundation
-
   public static class SimplePublisher implements Flow.Publisher<Integer> {
 
     private final IntStream stream;
@@ -69,6 +45,7 @@ public class Flow9 {
     public void onSubscribe(final Subscription subscription) {
       this.subscription = subscription;
       System.out.print(".onSubscribe()");
+      subscription.request(1);
     }
 
     @Override

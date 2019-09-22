@@ -19,9 +19,9 @@ public class CompletableFuture8 {
     return completableFuture;
   }
   // end::future80[]
-
+ // tag::future81[]
   public static void main(String[] args) throws InterruptedException, ExecutionException {
-    // tag::future81[]
+   
     System.out.println("-- 1. callback");
     final CompletableFuture<Integer> calculate = calculate();
     Thread.sleep(10);
@@ -33,7 +33,7 @@ public class CompletableFuture8 {
     // -- 1. callback
     // inside.before.thenAccept:42.after.
     // end::future81[]
-
+    // tag::future82[]
     System.out.println("-- 2. transform/map future result");
     CompletableFuture
       .supplyAsync(() -> "abc")
@@ -43,9 +43,10 @@ public class CompletableFuture8 {
     // Output:
     // -- 2. transform/map future result
     // result thenApply: ABC
+    // end::future82[]
 
+    // tag::future83[]
     // -- 3. combine futures
-
     System.out.println("-- 3.1. flatMap: F[B] `flatMap` b -> F[C] => a -> F[C]");
     CompletableFuture
       .supplyAsync(() -> "one")
@@ -55,19 +56,21 @@ public class CompletableFuture8 {
     // output:
     // -- 3.1. flatMap: F[B] `flatMap` b -> F[C] => a -> F[C]
     // result thenCompose: one two
-
+    // end::future83[]
+    // tag::future84[]
     System.out.println("-- 3.2. wait for the result of two parallel futures");
     CompletableFuture
       .supplyAsync(() -> 7)
       .thenCombine(CompletableFuture.supplyAsync(() -> 6),
-        (a, b) -> 7 * 6
+        (a, b) -> a * b
       )
       .thenAccept(r -> System.out.println("result thenCombine: " + r))
       .join();
     // output:
     // -- 3.2. wait for the result of two parallel futures
     // result thenCombine: 42
-
+    // end::future84[]
+    // tag::future85[]
     System.out.println("-- 3.3. wait for multiple results");
     CompletableFuture<String> future1
       = CompletableFuture.supplyAsync(() -> "A.");
@@ -83,7 +86,8 @@ public class CompletableFuture8 {
     // output:
     // -- 3.3. wait for multiple results
     // allOf: A.B.C.
-
+    // end::future85[]
+    // tag::future86[]
     System.out.println("-- 4. exceptionally, handle");
     CompletableFuture
       .supplyAsync(() -> {
@@ -94,7 +98,7 @@ public class CompletableFuture8 {
     // output:
     // -- 4. exceptionally, handle
     // exceptionally: 2
-
+    // end::future86[]
   }
 
 }
