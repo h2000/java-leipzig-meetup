@@ -3,5 +3,7 @@
 https://github.com/reactive-streams/reactive-streams-jvm/blob/v1.0.3/README.md#specification
 * Greate tutorial Flow Java9: +
 https://thepracticaldeveloper.com/2018/01/31/reactive-programming-java-9-flow/ 
-* Reactor 3:+
+* Reactor 3: +
 https://projectreactor.io/docs/core/release/reference/#getting-started-introducing-reactor
+* Akka stream: +
+https://doc.akka.io/docs/akka/current/stream/index.html
