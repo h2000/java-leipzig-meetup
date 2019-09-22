@@ -40,43 +40,7 @@ document.getElementsByTagName( 'head' )[0].appendChild( link );</script><!--[if 
     // Output:
     // -- 1. callback
     // inside.before.thenAccept:42.after.</code></pre></section></section>
-<section id="_rx" data-transition="zoom"><h2>RX</h2><div class="literalblock"><div class="content"><pre>@startuml
-
-title Reactive Streams Specification\nSimplified Communication Flow
-'skinparam handwritten true
-skinparam shadowing false
-
-skinparam sequence {
-ArrowColor black
-ActorBorderColor black
-LifeLineBorderColor black
-LifeLineBackgroundColor black
-
-ParticipantBorderColor black
-ParticipantBackgroundColor white
-ParticipantFontColor black
-}
-
-Subscriber -&gt; Publisher : subscribe()
-Publisher -&gt; Subscription : new()
-Publisher -&gt; Subscriber : onSubscribe(Subscription)
-loop until completed
-Subscriber -&gt; Subscription : request(int)
-Subscription -&gt; Publisher
-alt no error
-Publisher -&gt; Subscriber : onNext(T)
-else error
-Publisher -&gt; Subscriber : onError(Throwable)
-end
-
-alt cancel subscription
-Subscriber -&gt; Subscription : cancel()
-Subscription -&gt; Publisher
-end
-end
-Publisher -&gt; Subscriber : onComplete()
-
-@enduml</pre></div></div></section></div></div><script src="reveal.js/lib/js/head.min.js"></script><script src="reveal.js/js/reveal.js"></script><script>Array.prototype.slice.call(document.querySelectorAll('.slides section')).forEach(function(slide) {
+<section id="_reactive_streams_specification" data-transition="zoom"><h2>Reactive Streams Specification</h2><div class="imageblock" style=""><img src="rx2.png" alt="rx2"></div></section></div></div><script src="reveal.js/lib/js/head.min.js"></script><script src="reveal.js/js/reveal.js"></script><script>Array.prototype.slice.call(document.querySelectorAll('.slides section')).forEach(function(slide) {
   if (slide.getAttribute('data-background-color')) return;
   // user needs to explicitly say he wants CSS color to override otherwise we might break custom css or theme (#226)
   if (!(slide.classList.contains('canvas') || slide.classList.contains('background'))) return;

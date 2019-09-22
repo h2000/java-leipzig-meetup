@@ -1,4 +1,5 @@
 all:
 	bundle exec asciidoctor-revealjs tutorial.adoc
-	open tutorial.html
+	cp tutorial.html *.png ../../../docs
+	mv ../../../docs/tutorial.html ../../../index.html
 

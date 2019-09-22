@@ -36,45 +36,6 @@ include::../java/de/meetup/CompletableFuture8.java[tags=future81]
 
 
 [transition=zoom, %notitle]
-== RX
+== Reactive Streams Specification
 
-[plantuml, diagram-classes, png]
-....
-@startuml
-
-title Reactive Streams Specification\nSimplified Communication Flow
-'skinparam handwritten true
-skinparam shadowing false
-
-skinparam sequence {
-ArrowColor black
-ActorBorderColor black
-LifeLineBorderColor black
-LifeLineBackgroundColor black
-
-ParticipantBorderColor black
-ParticipantBackgroundColor white
-ParticipantFontColor black
-}
-
-Subscriber -> Publisher : subscribe()
-Publisher -> Subscription : new()
-Publisher -> Subscriber : onSubscribe(Subscription)
-loop until completed
-Subscriber -> Subscription : request(int)
-Subscription -> Publisher
-alt no error
-Publisher -> Subscriber : onNext(T)
-else error
-Publisher -> Subscriber : onError(Throwable)
-end
-
-alt cancel subscription
-Subscriber -> Subscription : cancel()
-Subscription -> Publisher
-end
-end
-Publisher -> Subscriber : onComplete()
-
-@enduml
-....
+image::rx2.png[]
