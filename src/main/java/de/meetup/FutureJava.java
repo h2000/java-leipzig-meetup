@@ -73,6 +73,6 @@ public class FutureJava {
     // Calculating 3...
     // result3: 25
     // end::future3[]
-
+    System.exit(0);
   }
 }

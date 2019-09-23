@@ -1,82 +1,139 @@
 package de.meetup;
 
-import java.util.concurrent.Flow;
+import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.Flow.Subscriber;
 import java.util.concurrent.Flow.Subscription;
-import java.util.stream.IntStream;
+import java.util.concurrent.SubmissionPublisher;
+import java.util.concurrent.TimeUnit;
 
 public class Flow9 {
+// tag::publisher[]
+  public static class PeriodicPublisher extends SubmissionPublisher<Long> implements AutoCloseable {
+    final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
+    final ScheduledFuture<?> periodicTask;
+    int counter = 0; long period = 500; TimeUnit unit = TimeUnit.MILLISECONDS;
+    int maxCount; Optional<Integer> exceptionOn;
 
-  public static class SimplePublisher implements Flow.Publisher<Integer> {
-
-    private final IntStream stream;
-    private final boolean throwException;
-
-    public SimplePublisher(int max, boolean throwException) {
-      this.stream = IntStream.range(0, max);
-      this.throwException = throwException;
+    PeriodicPublisher(Executor executor, int maxBufferCapacity,
+                      int maxCount, Optional<Integer> exceptionOn) {
+      super(executor, maxBufferCapacity);
+      this.maxCount = maxCount;
+      this.exceptionOn = exceptionOn;
+      periodicTask = scheduler.scheduleAtFixedRate(this::emit, 0, period, unit);
     }
-
-    @Override
-    public void subscribe(final Subscriber<? super Integer> subscriber) {
-      subscriber.onSubscribe(new Subscription() {
-        @Override
-        public void request(final long n) { /* TODO */}
-
-        @Override
-        public void cancel() { /* TODO */}
-      });
-      for (int item : stream.toArray()) {
-        if (throwException && item == 3) {
-          subscriber.onError(new RuntimeException("boom"));
-          return;
-        }
-        subscriber.onNext(item);
+    public void emit() {
+      try {
+      if(exceptionOn.map( n -> n == counter).orElse(false)) {
+         throw new RuntimeException("boom"); 
+      } 
+      if(counter < maxCount) { 
+        submit(System.currentTimeMillis());
+        counter++;
+      } else {
+        close();
+      } 
+      } catch (Exception e) {
+        closeExceptionally(e);
       }
-      subscriber.onComplete();
+    }
+
+    public void close() {
+      periodicTask.cancel(false);
+      scheduler.shutdown();
+      super.close();
     }
   }
-
-  public static class MySubscriber implements Subscriber<Integer> {
-
+// end::publisher[]
+// tag::subscriber[]
+  public static class MySubscriber implements Subscriber<Long> {
     private Subscription subscription;
+    private CountDownLatch latch;
+    private int counter = 4;
 
-    @Override
-    public void onSubscribe(final Subscription subscription) {
-      this.subscription = subscription;
+    public MySubscriber(CountDownLatch latch) { this.latch = latch; }
+    @Override public void onSubscribe(final Subscription subscription) {
       System.out.print(".onSubscribe()");
-      subscription.request(1);
+      this.subscription = subscription;
+      this.subscription.request(1);
     }
 
-    @Override
-    public void onNext(final Integer item) {
+    @Override public void onNext(final Long item) {
       System.out.print(".onNext(" + item + ")");
-      subscription.request(1);
+      
+      if(counter > 0) { subscription.request(1); counter--; } 
+      else { subscription.cancel();  latch.countDown(); }
     }
 
-    @Override
-    public void onError(final Throwable throwable) {
+    @Override public void onError(final Throwable throwable) {
       System.out.print(".onError(" + throwable + ")");
+      latch.countDown();
     }
-
-    @Override
-    public void onComplete() {
+    @Override public void onComplete() {
       System.out.print(".onComplete()");
+      latch.countDown();
     }
   }
+  // end::subscriber[]
 
   public static void main(String[] args) {
-    System.out.println("happy path");
-    new SimplePublisher(4, false)
-      .subscribe(new MySubscriber());
-    // output: happy path
-    //.onSubscribe().onNext(0).onNext(1).onNext(2).onNext(3).onComplete()
+    // tag::flow1[]
+    try (PeriodicPublisher publisher = 
+      new PeriodicPublisher(ForkJoinPool.commonPool(), 10, // maxBufferCapacity
+        3, Optional.empty() // producer stops after 3 rounds, no exception
+        )){
 
-    System.out.println("\nexceptional path");
-    new SimplePublisher(4, true)
-      .subscribe(new MySubscriber());
-    // output: exceptional path
-    // .onSubscribe().onNext(0).onNext(1).onNext(2).onError(java.lang.RuntimeException: boom)
+      System.out.println("\nnormal run:");
+      CountDownLatch latch = new CountDownLatch(1);
+      publisher.subscribe(new MySubscriber(latch));
+      // normal run:
+      // .onSubscribe().onNext(1569232282069).onNext(1569232283068)
+      // .onNext(1569232284067).onComplete()
+      
+      latch.await();
+    } catch (Exception e) {
+      System.err.println(e);
+      e.printStackTrace();
+    }
+    // end::flow1[]
+    // tag::flow2[]
+    try (PeriodicPublisher publisher = 
+      new PeriodicPublisher(ForkJoinPool.commonPool(), 10, // maxBufferCapacity
+        5, Optional.empty() // producer stops after 5 rounds, no exception
+        )){
+
+      System.out.println("\nsubscriber canceled:");
+      CountDownLatch latch = new CountDownLatch(1);
+      publisher.subscribe(new MySubscriber(latch));
+      // subscriber canceled:
+      // .onSubscribe().onNext(1569236384984).onNext(1569236385488)
+      // .onNext(1569236385989).onNext(1569236386484).onNext(1569236386988)
+      
+      latch.await();
+    } catch (Exception e) { System.err.println(e); e.printStackTrace(); }
+    // end::flow2[]
+    // tag::flow3[]
+    try (PeriodicPublisher publisher = 
+    new PeriodicPublisher(ForkJoinPool.commonPool(), 10, // maxBufferCapacity
+      5, Optional.of(2) // exception in producer
+      )){
+
+    System.out.println("\nproducer explodes:");
+    CountDownLatch latch = new CountDownLatch(1);
+    publisher.subscribe(new MySubscriber(latch));
+    // producer explodes:
+    //.onSubscribe().onNext(1569236722503).onNext(1569236723007)
+    //.onError(java.lang.RuntimeException: boom)
+    
+    latch.await();
+  } catch (Exception e) { System.err.println(e); e.printStackTrace(); }
+  // end::flow3[]
+  System.exit(0);
   }
 
 

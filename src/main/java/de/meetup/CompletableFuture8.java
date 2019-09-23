@@ -27,7 +27,8 @@ public class CompletableFuture8 {
     Thread.sleep(10);
     System.out.print("before.");
 
-    calculate.thenAccept(nr -> System.out.print("thenAccept:" + nr + ".")).join();
+    calculate.thenAccept(nr -> System.out.print("thenAccept:" + nr + "."))
+        .join(); // .join() -> wait of result (used only for demo)
     System.out.print("after.\n");
     // Output:
     // -- 1. callback
@@ -47,14 +48,14 @@ public class CompletableFuture8 {
 
     // tag::future83[]
     // -- 3. combine futures
-    System.out.println("-- 3.1. flatMap: F[B] `flatMap` b -> F[C] => a -> F[C]");
+    System.out.println("-- 3.1. compose ~ flatMap");
     CompletableFuture
       .supplyAsync(() -> "one")
       .thenCompose(s -> CompletableFuture.supplyAsync(() -> s + " two"))
       .thenAccept(r -> System.out.println("result thenCompose: " + r))
       .join();
     // output:
-    // -- 3.1. flatMap: F[B] `flatMap` b -> F[C] => a -> F[C]
+    // -- 3.1. compose ~ flatMap
     // result thenCompose: one two
     // end::future83[]
     // tag::future84[]
@@ -94,11 +95,14 @@ public class CompletableFuture8 {
         throw new NullPointerException();
       })
       .exceptionally(ex -> 2L)
-      .thenAccept(c -> System.out.println("exceptionally: " + c));
+      .thenAccept(c -> System.out.println("exceptionally: " + c))
+      .join()
+      ;
     // output:
     // -- 4. exceptionally, handle
     // exceptionally: 2
     // end::future86[]
+    System.exit(0);
   }
 
 }

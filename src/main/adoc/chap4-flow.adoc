@@ -18,8 +18,8 @@ Highlights
 * High level but high value abstraction that is concurrency-agnostic
 
 
-“Reactive Streams”-Standard defines simple interfaces and rules (incl. test kit TCK) +
-=> new foundation in Java 9 for implementation of reactive for example JDBC, Kafka drivers and adapters 
+“Reactive Streams”-Standard defines simple interfaces and many rules (incl. TCK) +
+=> New foundation in Java 9 for implementation of reactive frameworks 
 
 === New interfaces and a class
 
@@ -33,3 +33,49 @@ Highlights
 === !
 [.stretch]
 image::rx2.svg[]
+
+=== !
+// Flow publisher
+
+[.stretch]
+[source,java]
+----
+include::../java/de/meetup/Flow9.java[tags=publisher]
+----
+
+=== !
+// Flow subscriber
+
+[.stretch]
+[source,java]
+----
+include::../java/de/meetup/Flow9.java[tags=subscriber]
+----
+
+=== !
+// Flow main producer finish
+
+[.stretch]
+[source,java]
+----
+include::../java/de/meetup/Flow9.java[tags=flow1]
+----
+
+
+=== !
+// Flow main subscriber canceled
+
+[.stretch]
+[source,java]
+----
+include::../java/de/meetup/Flow9.java[tags=flow2]
+----
+
+=== !
+// Flow main onError()
+
+[.stretch]
+[source,java]
+----
+include::../java/de/meetup/Flow9.java[tags=flow3]
+----
