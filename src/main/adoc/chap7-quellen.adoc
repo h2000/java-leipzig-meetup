@@ -1,8 +1,10 @@
 == Quellen
 * Specification Reactive Streams JVM: +
 https://github.com/reactive-streams/reactive-streams-jvm/blob/v1.0.3/README.md#specification
-* Great tutorial Flow Java9: +
+* Great tutorial: +
 https://thepracticaldeveloper.com/2018/01/31/reactive-programming-java-9-flow/ 
+* Other good overview: +
+https://blog.softwaremill.com/how-not-to-use-reactive-streams-in-java-9-7a39ea9c2cb3 
 * Reactor 3: +
 https://projectreactor.io/docs/core/release/reference/#getting-started-introducing-reactor
 * Akka stream: +

@@ -338,10 +338,33 @@ document.getElementsByTagName( 'head' )[0].appendChild( link );</script><!--[if 
     // .onError(java.lang.RuntimeException: boom)
 
     latch.await();
-  } catch (Exception e) { System.err.println(e); e.printStackTrace(); }</code></pre></section></section>
+  } catch (Exception e) { System.err.println(e); e.printStackTrace(); }</code></pre></section><section><pre class="highlight listingblock stretch"><code data-noescape class="java language-java">    public static void main(String[] args) {
+        Publisher&lt;Long&gt; reactorPublisher = reactorPublisher();
+        Processor&lt;Long, Long&gt; akkaStreamsProcessor = akkaStreamsProcessor();
+
+        reactorPublisher.subscribe(akkaStreamsProcessor);
+
+        Flowable
+            .fromPublisher(FlowAdapters.toProcessor(akkaStreamsProcessor))
+            .subscribe(System.out::println);
+    }
+
+    private static Publisher&lt;Long&gt; reactorPublisher() {
+        Flux&lt;Long&gt; numberFlux = Flux.interval(Duration.ofSeconds(1));
+        return JdkFlowAdapter.publisherToFlowPublisher(numberFlux);
+    }
+
+    private static Processor&lt;Long, Long&gt; akkaStreamsProcessor() {
+        Flow&lt;Long, Long, akka.NotUsed&gt; negatingFlow = Flow.of(Long.class).map(i -&gt; -i);
+        return JavaFlowSupport.Flow.toProcessor(negatingFlow).run(materializer);
+    }
+
+    private static ActorSystem actorSystem = ActorSystem.create();
+    private static ActorMaterializer materializer = ActorMaterializer.create(actorSystem);</code></pre></section></section>
 <section id="_quellen"><h2>Quellen</h2><div class="ulist"><ul><li><p>Specification Reactive Streams JVM:<br>
-<a href="https://github.com/reactive-streams/reactive-streams-jvm/blob/v1.0.3/README.md#specification" class="bare">https://github.com/reactive-streams/reactive-streams-jvm/blob/v1.0.3/README.md#specification</a></p></li><li><p>Great tutorial Flow Java9:<br>
-<a href="https://thepracticaldeveloper.com/2018/01/31/reactive-programming-java-9-flow/" class="bare">https://thepracticaldeveloper.com/2018/01/31/reactive-programming-java-9-flow/</a></p></li><li><p>Reactor 3:<br>
+<a href="https://github.com/reactive-streams/reactive-streams-jvm/blob/v1.0.3/README.md#specification" class="bare">https://github.com/reactive-streams/reactive-streams-jvm/blob/v1.0.3/README.md#specification</a></p></li><li><p>Great tutorial:<br>
+<a href="https://thepracticaldeveloper.com/2018/01/31/reactive-programming-java-9-flow/" class="bare">https://thepracticaldeveloper.com/2018/01/31/reactive-programming-java-9-flow/</a></p></li><li><p>Other good overview:<br>
+<a href="https://blog.softwaremill.com/how-not-to-use-reactive-streams-in-java-9-7a39ea9c2cb3" class="bare">https://blog.softwaremill.com/how-not-to-use-reactive-streams-in-java-9-7a39ea9c2cb3</a></p></li><li><p>Reactor 3:<br>
 <a href="https://projectreactor.io/docs/core/release/reference/#getting-started-introducing-reactor" class="bare">https://projectreactor.io/docs/core/release/reference/#getting-started-introducing-reactor</a></p></li><li><p>Akka stream:<br>
 <a href="https://doc.akka.io/docs/akka/current/stream/index.html" class="bare">https://doc.akka.io/docs/akka/current/stream/index.html</a></p></li></ul></div></section></div></div><script src="reveal.js/lib/js/head.min.js"></script><script src="reveal.js/js/reveal.js"></script><script>Array.prototype.slice.call(document.querySelectorAll('.slides section')).forEach(function(slide) {
   if (slide.getAttribute('data-background-color')) return;
