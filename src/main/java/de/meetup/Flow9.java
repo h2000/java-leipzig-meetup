@@ -14,38 +14,33 @@ import java.util.concurrent.TimeUnit;
 
 public class Flow9 {
 // tag::publisher[]
-  public static class PeriodicPublisher extends SubmissionPublisher<Long> implements AutoCloseable {
+  public static class MyPublisher 
+      extends SubmissionPublisher<Long> implements AutoCloseable {
     final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
     final ScheduledFuture<?> periodicTask;
     int counter = 0; long period = 500; TimeUnit unit = TimeUnit.MILLISECONDS;
     int maxCount; Optional<Integer> exceptionOn;
 
-    PeriodicPublisher(Executor executor, int maxBufferCapacity,
+    MyPublisher(Executor executor, int maxBufferCapacity,
                       int maxCount, Optional<Integer> exceptionOn) {
       super(executor, maxBufferCapacity);
-      this.maxCount = maxCount;
-      this.exceptionOn = exceptionOn;
+      this.maxCount = maxCount; this.exceptionOn = exceptionOn;
       periodicTask = scheduler.scheduleAtFixedRate(this::emit, 0, period, unit);
     }
     public void emit() {
       try {
-      if(exceptionOn.map( n -> n == counter).orElse(false)) {
-         throw new RuntimeException("boom"); 
-      } 
-      if(counter < maxCount) { 
-        submit(System.currentTimeMillis());
-        counter++;
-      } else {
-        close();
-      } 
-      } catch (Exception e) {
-        closeExceptionally(e);
-      }
+        if(exceptionOn.map( n -> n == counter).orElse(false)) {
+          throw new RuntimeException("boom"); 
+        } 
+        if(counter < maxCount) { 
+          submit(System.currentTimeMillis());
+          counter++;
+        } else { close(); } 
+      } catch (Exception e) { closeExceptionally(e); }
     }
-
     public void close() {
-      periodicTask.cancel(false);
-      scheduler.shutdown();
+      periodicTask.cancel(false); 
+       scheduler.shutdown();
       super.close();
     }
   }
@@ -57,6 +52,7 @@ public class Flow9 {
     private int counter = 4;
 
     public MySubscriber(CountDownLatch latch) { this.latch = latch; }
+
     @Override public void onSubscribe(final Subscription subscription) {
       System.out.print(".onSubscribe()");
       this.subscription = subscription;
@@ -65,15 +61,15 @@ public class Flow9 {
 
     @Override public void onNext(final Long item) {
       System.out.print(".onNext(" + item + ")");
-      
       if(counter > 0) { subscription.request(1); counter--; } 
       else { subscription.cancel();  latch.countDown(); }
     }
-
+    
     @Override public void onError(final Throwable throwable) {
       System.out.print(".onError(" + throwable + ")");
       latch.countDown();
     }
+    
     @Override public void onComplete() {
       System.out.print(".onComplete()");
       latch.countDown();
@@ -83,8 +79,8 @@ public class Flow9 {
 
   public static void main(String[] args) {
     // tag::flow1[]
-    try (PeriodicPublisher publisher = 
-      new PeriodicPublisher(ForkJoinPool.commonPool(), 10, // maxBufferCapacity
+    try (MyPublisher  publisher = 
+      new MyPublisher(ForkJoinPool.commonPool(), 10, // maxBufferCapacity
         3, Optional.empty() // producer stops after 3 rounds, no exception
         )){
 
@@ -102,8 +98,8 @@ public class Flow9 {
     }
     // end::flow1[]
     // tag::flow2[]
-    try (PeriodicPublisher publisher = 
-      new PeriodicPublisher(ForkJoinPool.commonPool(), 10, // maxBufferCapacity
+    try (MyPublisher  publisher = 
+      new MyPublisher(ForkJoinPool.commonPool(), 10, // maxBufferCapacity
         5, Optional.empty() // producer stops after 5 rounds, no exception
         )){
 
@@ -118,8 +114,8 @@ public class Flow9 {
     } catch (Exception e) { System.err.println(e); e.printStackTrace(); }
     // end::flow2[]
     // tag::flow3[]
-    try (PeriodicPublisher publisher = 
-    new PeriodicPublisher(ForkJoinPool.commonPool(), 10, // maxBufferCapacity
+    try (MyPublisher  publisher = 
+    new MyPublisher(ForkJoinPool.commonPool(), 10, // maxBufferCapacity
       5, Optional.of(2) // exception in producer
       )){
 
@@ -127,8 +123,8 @@ public class Flow9 {
     CountDownLatch latch = new CountDownLatch(1);
     publisher.subscribe(new MySubscriber(latch));
     // producer explodes:
-    //.onSubscribe().onNext(1569236722503).onNext(1569236723007)
-    //.onError(java.lang.RuntimeException: boom)
+    // .onSubscribe().onNext(1569236722503).onNext(1569236723007)
+    // .onError(java.lang.RuntimeException: boom)
     
     latch.await();
   } catch (Exception e) { System.err.println(e); e.printStackTrace(); }

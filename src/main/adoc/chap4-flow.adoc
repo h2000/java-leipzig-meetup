@@ -18,8 +18,8 @@ Highlights
 * High level but high value abstraction that is concurrency-agnostic
 
 
-“Reactive Streams”-Standard defines simple interfaces and many rules (incl. TCK) +
-=> New foundation in Java 9 for implementation of reactive frameworks 
+“Reactive Streams”-standard defines simple interfaces and **many rules** (incl. TCK) +
+=> Foundation in Java 9 for implementation of reactive frameworks 
 
 === New interfaces and a class
 

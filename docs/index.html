@@ -237,39 +237,34 @@ document.getElementsByTagName( 'head' )[0].appendChild( link );</script><!--[if 
 <div class="ulist"><ul><li><p><code>T &#8594; Future&lt;T&gt;</code></p></li><li><p><code>Iterable&lt;T&gt; &#8594; Flow.Publisher&lt;T&gt;</code></p></li></ul></div>
 <div class="paragraph"><p>Highlights</p></div>
 <div class="ulist"><ul><li><p>Composability and readability</p></li><li><p>Data as a flow manipulated with a rich vocabulary of operators</p></li><li><p>Back pressure the consumer can signal the producer that the rate of emission is too high</p></li><li><p>High level but high value abstraction that is concurrency-agnostic</p></li></ul></div>
-<div class="paragraph"><p>“Reactive Streams”-Standard defines simple interfaces and many rules (incl. TCK)<br>
-&#8658; New foundation in Java 9 for implementation of reactive frameworks</p></div></section><section id="_new_interfaces_and_a_class"><h2>New interfaces and a class</h2><div class="ulist"><ul><li><p>interfaces (impl. must be compliant to the Reactive Streams Standard)</p><div class="ulist"><ul><li><p><code>Flow.Publisher&lt;T&gt;</code> : produces items and control signals</p></li><li><p><code>Flow.Subscriber&lt;T&gt;</code> : receives items and signals</p></li><li><p><code>Flow.Subscription</code> : links the Publisher and Subscriber</p></li><li><p><code>Flow.Processor&lt;T,R&gt;`</code> : has advanced operations e.g. to chain transformations of items from Publisher to Subscriber</p></li></ul></div></li><li><p>class <code>SubmissionPublisher&lt;T&gt;</code> implements Publisher&lt;T&gt; and is a flexible producer of items, good starting point for own implementations</p></li></ul></div></section><section><div class="imageblock stretch" style=""><img src="rx2.svg" alt="rx2" height="100%"></div></section><section><pre class="highlight listingblock stretch"><code data-noescape class="java language-java">  public static class PeriodicPublisher extends SubmissionPublisher&lt;Long&gt; implements AutoCloseable {
+<div class="paragraph"><p>“Reactive Streams”-standard defines simple interfaces and <strong>many rules</strong> (incl. TCK)<br>
+&#8658; Foundation in Java 9 for implementation of reactive frameworks</p></div></section><section id="_new_interfaces_and_a_class"><h2>New interfaces and a class</h2><div class="ulist"><ul><li><p>interfaces (impl. must be compliant to the Reactive Streams Standard)</p><div class="ulist"><ul><li><p><code>Flow.Publisher&lt;T&gt;</code> : produces items and control signals</p></li><li><p><code>Flow.Subscriber&lt;T&gt;</code> : receives items and signals</p></li><li><p><code>Flow.Subscription</code> : links the Publisher and Subscriber</p></li><li><p><code>Flow.Processor&lt;T,R&gt;`</code> : has advanced operations e.g. to chain transformations of items from Publisher to Subscriber</p></li></ul></div></li><li><p>class <code>SubmissionPublisher&lt;T&gt;</code> implements Publisher&lt;T&gt; and is a flexible producer of items, good starting point for own implementations</p></li></ul></div></section><section><div class="imageblock stretch" style=""><img src="rx2.svg" alt="rx2" height="100%"></div></section><section><pre class="highlight listingblock stretch"><code data-noescape class="java language-java">  public static class MyPublisher
+      extends SubmissionPublisher&lt;Long&gt; implements AutoCloseable {
     final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
     final ScheduledFuture&lt;?&gt; periodicTask;
     int counter = 0; long period = 500; TimeUnit unit = TimeUnit.MILLISECONDS;
     int maxCount; Optional&lt;Integer&gt; exceptionOn;
 
-    PeriodicPublisher(Executor executor, int maxBufferCapacity,
+    MyPublisher(Executor executor, int maxBufferCapacity,
                       int maxCount, Optional&lt;Integer&gt; exceptionOn) {
       super(executor, maxBufferCapacity);
-      this.maxCount = maxCount;
-      this.exceptionOn = exceptionOn;
+      this.maxCount = maxCount; this.exceptionOn = exceptionOn;
       periodicTask = scheduler.scheduleAtFixedRate(this::emit, 0, period, unit);
     }
     public void emit() {
       try {
-      if(exceptionOn.map( n -&gt; n == counter).orElse(false)) {
-         throw new RuntimeException("boom");
-      }
-      if(counter &lt; maxCount) {
-        submit(System.currentTimeMillis());
-        counter++;
-      } else {
-        close();
-      }
-      } catch (Exception e) {
-        closeExceptionally(e);
-      }
+        if(exceptionOn.map( n -&gt; n == counter).orElse(false)) {
+          throw new RuntimeException("boom");
+        }
+        if(counter &lt; maxCount) {
+          submit(System.currentTimeMillis());
+          counter++;
+        } else { close(); }
+      } catch (Exception e) { closeExceptionally(e); }
     }
-
     public void close() {
       periodicTask.cancel(false);
-      scheduler.shutdown();
+       scheduler.shutdown();
       super.close();
     }
   }</code></pre></section><section><pre class="highlight listingblock stretch"><code data-noescape class="java language-java">  public static class MySubscriber implements Subscriber&lt;Long&gt; {
@@ -278,6 +273,7 @@ document.getElementsByTagName( 'head' )[0].appendChild( link );</script><!--[if 
     private int counter = 4;
 
     public MySubscriber(CountDownLatch latch) { this.latch = latch; }
+
     @Override public void onSubscribe(final Subscription subscription) {
       System.out.print(".onSubscribe()");
       this.subscription = subscription;
@@ -286,7 +282,6 @@ document.getElementsByTagName( 'head' )[0].appendChild( link );</script><!--[if 
 
     @Override public void onNext(final Long item) {
       System.out.print(".onNext(" + item + ")");
-
       if(counter &gt; 0) { subscription.request(1); counter--; }
       else { subscription.cancel();  latch.countDown(); }
     }
@@ -295,12 +290,13 @@ document.getElementsByTagName( 'head' )[0].appendChild( link );</script><!--[if 
       System.out.print(".onError(" + throwable + ")");
       latch.countDown();
     }
+
     @Override public void onComplete() {
       System.out.print(".onComplete()");
       latch.countDown();
     }
-  }</code></pre></section><section><pre class="highlight listingblock stretch"><code data-noescape class="java language-java">    try (PeriodicPublisher publisher =
-      new PeriodicPublisher(ForkJoinPool.commonPool(), 10, // maxBufferCapacity
+  }</code></pre></section><section><pre class="highlight listingblock stretch"><code data-noescape class="java language-java">    try (MyPublisher  publisher =
+      new MyPublisher(ForkJoinPool.commonPool(), 10, // maxBufferCapacity
         3, Optional.empty() // producer stops after 3 rounds, no exception
         )){
 
@@ -315,8 +311,8 @@ document.getElementsByTagName( 'head' )[0].appendChild( link );</script><!--[if 
     } catch (Exception e) {
       System.err.println(e);
       e.printStackTrace();
-    }</code></pre></section><section><pre class="highlight listingblock stretch"><code data-noescape class="java language-java">    try (PeriodicPublisher publisher =
-      new PeriodicPublisher(ForkJoinPool.commonPool(), 10, // maxBufferCapacity
+    }</code></pre></section><section><pre class="highlight listingblock stretch"><code data-noescape class="java language-java">    try (MyPublisher  publisher =
+      new MyPublisher(ForkJoinPool.commonPool(), 10, // maxBufferCapacity
         5, Optional.empty() // producer stops after 5 rounds, no exception
         )){
 
@@ -328,8 +324,8 @@ document.getElementsByTagName( 'head' )[0].appendChild( link );</script><!--[if 
       // .onNext(1569236385989).onNext(1569236386484).onNext(1569236386988)
 
       latch.await();
-    } catch (Exception e) { System.err.println(e); e.printStackTrace(); }</code></pre></section><section><pre class="highlight listingblock stretch"><code data-noescape class="java language-java">    try (PeriodicPublisher publisher =
-    new PeriodicPublisher(ForkJoinPool.commonPool(), 10, // maxBufferCapacity
+    } catch (Exception e) { System.err.println(e); e.printStackTrace(); }</code></pre></section><section><pre class="highlight listingblock stretch"><code data-noescape class="java language-java">    try (MyPublisher  publisher =
+    new MyPublisher(ForkJoinPool.commonPool(), 10, // maxBufferCapacity
       5, Optional.of(2) // exception in producer
       )){
 
