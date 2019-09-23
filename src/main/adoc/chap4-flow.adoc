@@ -1,26 +1,34 @@
 == Reactive Streams (pull-push)
 
-TODO
-https://thepracticaldeveloper.com/2018/01/31/reactive-programming-java-9-flow/
+=== Background and motivation
 
-=== Motivation
+**Put consumer in control of the data flow**
 
 Generalisation
 
-* T -> Future<T>
-* Iterable<T> -> Flow.Publisher<T>
+* `T -> Future<T>`
+* `Iterable<T> -> Flow.Publisher<T>`
 
-Pattern: onNext(t) 0..N [onError(Throwable) | onComplete()]
+
+Highlights
 
 * Composability and readability
 * Data as a flow manipulated with a rich vocabulary of operators
-* Nothing happens until you subscribe
 * Back pressure the consumer can signal the producer that the rate of emission is too high
 * High level but high value abstraction that is concurrency-agnostic
 
 
 “Reactive Streams”-Standard defines simple interfaces and rules (incl. test kit TCK) +
-=> which are now in java9 as Foundation
+=> new foundation in Java 9 for implementation of reactive for example JDBC, Kafka drivers and adapters 
+
+=== New interfaces and classes
+
+* interfaces (impl. must be compliant to the Reactive Streams Standard)
+** `Flow.Publisher<T>` : produces items and control signals
+** `Flow.Subscriber<T>` : receives items and signals
+** `Flow.Subscription` : links the Publisher and Subscriber
+** `Flow.Processor<T,R>`` : has advanced operations e.g. to chain transformations of items from Publisher to Subscriber
+* class `SubmissionPublisher<T>` implements Publisher<T> and is a flexible producer of items, good starting point for own implementations
 
 === !
 [.stretch]

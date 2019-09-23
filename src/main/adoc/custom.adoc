@@ -5,6 +5,11 @@
     font-size: large;
     line-height: normal;
 }
+.reveal li > p > code {
+    font-size: x-large;
+    line-height: normal;
+}
+
 .reveal section img {
   border: 0;
   box-shadow: none;
