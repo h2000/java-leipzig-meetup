@@ -7,6 +7,12 @@
 Alf Richter 23.09.2019
 
 include::custom.adoc[]
+== Table of contents
+
+* Future before Java 8 : PULL
+* Future in Java 8: PUSH
+* Future in Java 9: PUSH
+* Flow in Java 9: PULL-PUSH
 
 include::chap1-future-before.adoc[]
 include::chap2-future-java8.adoc[]

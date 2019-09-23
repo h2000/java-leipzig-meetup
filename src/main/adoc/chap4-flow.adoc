@@ -1,4 +1,4 @@
-== Reactive Streams (pull-push)
+== Java 9: Reactive Streams (pull-push)
 
 === Background and motivation
 
@@ -21,7 +21,7 @@ Highlights
 “Reactive Streams”-Standard defines simple interfaces and rules (incl. test kit TCK) +
 => new foundation in Java 9 for implementation of reactive for example JDBC, Kafka drivers and adapters 
 
-=== New interfaces and classes
+=== New interfaces and a class
 
 * interfaces (impl. must be compliant to the Reactive Streams Standard)
 ** `Flow.Publisher<T>` : produces items and control signals
