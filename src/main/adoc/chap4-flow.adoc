@@ -88,3 +88,12 @@ include::../java/de/meetup/Flow9.java[tags=flow3]
 ----
 include::../java/de/meetup/Flow9Integration.java[tags=flowInt]
 ----
+
+=== !
+// Flow integration imports
+
+[.stretch]
+[source,java]
+----
+include::../java/de/meetup/Flow9Integration.java[tags=flowIntImports]
+----

@@ -1,5 +1,5 @@
 package de.meetup;
-
+// tag::flowIntImports[]
 import akka.actor.ActorSystem;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Flow;
@@ -12,7 +12,7 @@ import reactor.core.publisher.Flux;
 import java.time.Duration;
 import java.util.concurrent.Flow.Processor;
 import java.util.concurrent.Flow.Publisher;
-
+// end::flowIntImports[]
 public class Flow9Integration {
     // tag::flowInt[]
     public static void main(String[] args) {
