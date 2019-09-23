@@ -4,10 +4,12 @@
 :revealjs_theme: white
 :highlightjs-theme: https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/googlecode.min.css
 :revealjs_slideNumber: true
+:linkattrs:
+
 Alf Richter 23.09.2019
 
 include::custom.adoc[]
-== Table of contents
+== Content
 
 * Future before Java 8 : PULL
 * Future in Java 8: PUSH
