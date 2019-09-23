@@ -21,8 +21,8 @@ public class Flow9 {
     int counter = 0; long period = 500; TimeUnit unit = TimeUnit.MILLISECONDS;
     int maxCount; Optional<Integer> exceptionOn;
 
-    MyPublisher(Executor executor, int maxBufferCapacity,
-                      int maxCount, Optional<Integer> exceptionOn) {
+    public MyPublisher(Executor executor, int maxBufferCapacity,
+                       int maxCount, Optional<Integer> exceptionOn) {
       super(executor, maxBufferCapacity);
       this.maxCount = maxCount; this.exceptionOn = exceptionOn;
       periodicTask = scheduler.scheduleAtFixedRate(this::emit, 0, period, unit);
@@ -40,7 +40,7 @@ public class Flow9 {
     }
     public void close() {
       periodicTask.cancel(false); 
-       scheduler.shutdown();
+      scheduler.shutdown();
       super.close();
     }
   }
@@ -115,8 +115,8 @@ public class Flow9 {
     // end::flow2[]
     // tag::flow3[]
     try (MyPublisher  publisher = 
-    new MyPublisher(ForkJoinPool.commonPool(), 10, // maxBufferCapacity
-      5, Optional.of(2) // exception in producer
+      new MyPublisher(ForkJoinPool.commonPool(), 10, // maxBufferCapacity
+        5, Optional.of(2) // exception in producer
       )){
 
     System.out.println("\nproducer explodes:");
