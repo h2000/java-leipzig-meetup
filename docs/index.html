@@ -360,7 +360,18 @@ document.getElementsByTagName( 'head' )[0].appendChild( link );</script><!--[if 
     }
 
     private static ActorSystem actorSystem = ActorSystem.create();
-    private static ActorMaterializer materializer = ActorMaterializer.create(actorSystem);</code></pre></section></section>
+    private static ActorMaterializer materializer = ActorMaterializer.create(actorSystem);</code></pre></section><section><pre class="highlight listingblock stretch"><code data-noescape class="java language-java">import akka.actor.ActorSystem;
+import akka.stream.ActorMaterializer;
+import akka.stream.javadsl.Flow;
+import akka.stream.javadsl.JavaFlowSupport;
+import io.reactivex.Flowable;
+import org.reactivestreams.FlowAdapters;
+import reactor.adapter.JdkFlowAdapter;
+import reactor.core.publisher.Flux;
+
+import java.time.Duration;
+import java.util.concurrent.Flow.Processor;
+import java.util.concurrent.Flow.Publisher;</code></pre></section></section>
 <section id="_quellen"><h2>Quellen</h2><div class="ulist"><ul><li><p>Specification Reactive Streams JVM:<br>
 <a href="https://github.com/reactive-streams/reactive-streams-jvm/blob/v1.0.3/README.md#specification" class="bare">https://github.com/reactive-streams/reactive-streams-jvm/blob/v1.0.3/README.md#specification</a></p></li><li><p>Great tutorial:<br>
 <a href="https://thepracticaldeveloper.com/2018/01/31/reactive-programming-java-9-flow/" class="bare">https://thepracticaldeveloper.com/2018/01/31/reactive-programming-java-9-flow/</a></p></li><li><p>Other good overview:<br>
